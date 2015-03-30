@@ -3,11 +3,11 @@
 
 
 
-getter <- function (name,appendval=F) {
+getter <- function (name,appendval=F,year=2014) {
   require(XML)
   require(xlsx)
   require(stringr)
-  path <- paste0("data/2014/",name,".html")
+  path <- paste0("data/",year,"/",name,".html")
   doc.html <- htmlTreeParse(path,
                             useInternalNodes = T)
   
@@ -38,11 +38,11 @@ getter <- function (name,appendval=F) {
   # Write the results to xlsx file
   
   
-  write.xlsx(df,
-             file = paste0("GAEC", Year, ".xlsx"), 
-             sheetName = Country,
-             row.names=F,
-             append=appendval)
+  #write.xlsx(df,
+  #           file = paste0("GAEC", Year, ".xlsx"), 
+  #           sheetName = Country,
+  #           row.names=F,
+  #           append=appendval)
   
   return(df)
 }
