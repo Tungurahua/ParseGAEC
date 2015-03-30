@@ -8,7 +8,7 @@ library(dplyr)
 
 source("functions/getter.R")
 
-try(file.remove("GAEC2014.xlsx"))
+#try(file.remove("GAEC2014.xlsx"))
 
 
 #### Get 2014 Database
@@ -21,20 +21,14 @@ countries <- countries[!countries=="FR"]
 listOfDataFrames <- lapply(countries,FUN = function(x) getter(x,T))
 
 
-names(listOfDataFram)
 
 df <- ldply(listOfDataFrames, data.frame)
 
 #df[grepl("AZORES",df$titles,]
 
-df
-
-levels(df$titles)
-
-
 df15 <- data.frame(lapply(df, as.character), stringsAsFactors=FALSE)
 
-unique(df15$titles)
+#unique(df15$titles)
 
 # Replace Azores, Mainland and Madeira
 df15[grepl("AZORES",df15$titles),2] <- "Portugal AZORES"
@@ -68,13 +62,13 @@ df <- ldply(listOfDataFrames, data.frame)
 
 df15 <- data.frame(lapply(df, as.character), stringsAsFactors=FALSE)
 
-unique(df15$titles)
+#unique(df15$titles)
 df15$titles <- gsub("\n","",x = df15$titles)
 # Replace Azores, Mainland and Madeira
 df15[grepl("AZORES",df15$titles),2] <- "Portugal AZORES"
 df15$titles <- gsub(" for AZORES","",df15$titles)
 
-#df15[grepl("MAINLAND",df15$titles),2] <- "Portugal MAINLAND"
+df15[grepl("MAINLAND",df15$titles) & df15$Country == "Portugal",2] <- "Portugal MAINLAND"
 #df15$titles <- gsub(" for MAINLAND","",df15$titles)
 
 df15[grepl("MADEIRA",df15$titles),2] <- "Portugal MADEIRA"
@@ -100,19 +94,33 @@ df15$titles <- gsub(" for MARTINIQUE","",df15$titles)
 
 df2013 <- df15
 
-str(df2013)
-
-df <- rbind(df2013,df2014)
-
-df <- 
-  df %>%
+df2013 <- 
+  df2013 %>%
   filter(titles=="1.1 Minimum soil cover")%>%
-  select(Year,Country,text)
+  select(Country,text) %>%
+  rename(c("text"="X2013"))
 
-unique(df$titles)
-df3 <- dcast(data = df,formula = Country~Year)
+df2014 <- 
+  df2014 %>%
+  filter(titles=="1.1 Minimum soil cover")%>%
+  select(Country,text) %>%
+  rename(c("text"="X2014"))
 
-write.xlsx(df3,
+df_final <- merge(df2013,df2014,by = "Country")
+
+#str(df2013)
+
+# df <- rbind(df2013,df2014)
+# 
+# df <- 
+#   df %>%
+#   filter(titles=="1.1 Minimum soil cover")%>%
+#   select(Year,Country,text)
+# 
+# 
+# df3 <- dcast(data = df,formula = Country~Year)
+
+write.xlsx(df_final,
            file = "HollaDieWaldfee.xlsx", 
            sheetName = "1.1 Minimum soil cover",
            row.names=F)
